@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfis de Pessoas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .card {
+            width: 300px; 
+            border: 2px solid #D9534F;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+        }
+        .card-header {
+            padding: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: black;
+            text-align: center;
+        }
+        .card-body {
+            display: flex;
+            align-items: center;
+            padding: 10px; 
+        }
+        .card-body img {
+            width: 75px; 
+            height: 80px; 
+            border-radius: 10%;
+            margin-right: 10px; 
+        }
+        .info {
+            text-align: left;
+        }
+        .info p {
+            margin: 3px 0; 
+        }
+        .card-footer {
+            display: flex;
+        }
+        .footer-item {
+            flex: 1;
+            padding: 5px; 
+            font-weight: bold;
+            text-align: center;
+        }
+        .footer-item:nth-child(1) {
+            border-right: 2px solid #D9534F;
+        }
+        .masculino .card-header,
+        .masculino .card-footer {
+            background-color: #BFD7F0;
+            border-color: #D9534F;
+        }
+        .feminino .card-header,
+        .feminino .card-footer {
+            background-color: #FFD700;
+            border-color: #FFA500;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #D9534F;
+            border-radius: 10px;
+            width: 300px;
+            background-color: #fff;
+            text-align: center;
+        }
+        .button-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="button-container">
+    <button id="mediaButton">Média das Idades</button>
+    <button id="homemButton">Homem Mais Velho</button>
+    <button id="salarioButton">Maior Salário</button>
+</div>
+
+<div id="result"></div>
+<div id="card"></div>
+
+<script type="module">
+    import pessoas from './pessoas.js'; 
+
+    function listarPessoas(pessoas) {
+        const container = document.getElementById("card");
+        pessoas.forEach(pessoa => {
+            const card = document.createElement("div");
+            card.className = `card ${pessoa.genero.toLowerCase()}`;
+            const header = document.createElement("div");
+            header.className = "card-header";
+            header.innerText = pessoa.nome;
+            card.appendChild(header);
+            const body = document.createElement("div");
+            body.className = "card-body";
+            const img = document.createElement("img");
+            img.src = pessoa.foto;
+            img.alt = pessoa.nome;
+            body.appendChild(img);
+            const info = document.createElement("div");
+            info.className = "info";
+            const idade = document.createElement("p");
+            idade.innerHTML = `<strong>Idade:</strong> ${pessoa.idade}`;
+            info.appendChild(idade);
+            const altura = document.createElement("p");
+            altura.innerHTML = `<strong>Altura:</strong> ${pessoa.altura} m`;
+            info.appendChild(altura);
+            const peso = document.createElement("p");
+            peso.innerHTML = `<strong>Peso:</strong> ${pessoa.peso} kg`;
+            info.appendChild(peso);
+            const genero = document.createElement("p");
+            genero.innerHTML = `<strong>Gênero:</strong> ${pessoa.genero}`;
+            info.appendChild(genero);
+            body.appendChild(info);
+            card.appendChild(body);
+            const footer = document.createElement("div");
+            footer.className = "card-footer";
+            const profissao = document.createElement("div");
+            profissao.className = "footer-item";
+            profissao.innerText = pessoa.profissao;
+            footer.appendChild(profissao);
+            const salario = document.createElement("div");
+            salario.className = "footer-item";
+            salario.innerText = `R$ ${parseFloat(pessoa.salario).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+            footer.appendChild(salario);
+            card.appendChild(footer);
+            container.appendChild(card);
+        });
+    }
+
+    function calcularMediaIdades() {
+        const totalIdade = pessoas.reduce((acc, pessoa) => acc + pessoa.idade, 0);
+        const media = totalIdade / pessoas.length;
+        document.getElementById("result").innerText = `Média das idades: ${media.toFixed(2)} anos`;
+    }
+
+    function encontrarHomemMaisVelho() {
+        const homemMaisVelho = pessoas.filter(p => p.genero === 'Masculino').reduce((prev, curr) => (prev.idade > curr.idade) ? prev : curr);
+        document.getElementById("result").innerHTML = `
+            <strong>Homem Mais Velho:</strong><br>
+            Nome: ${homemMaisVelho.nome}<br>
+            Idade: ${homemMaisVelho.idade}<br>
+            Profissão: ${homemMaisVelho.profissao}<br>
+            Salário: R$ ${parseFloat(homemMaisVelho.salario).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}<br>
+            <img src="${homemMaisVelho.foto}" alt="${homemMaisVelho.nome}" style="width: 75px; height: 80px; border-radius: 10%;">
+        `;
+    }
+
+    function encontrarMaiorSalario() {
+        const maiorSalario = pessoas.reduce((prev, curr) => {
+            return parseFloat(prev.salario) > parseFloat(curr.salario) ? prev : curr;
+        });
+        document.getElementById("result").innerHTML = `
+            <strong>Maior Salário:</strong><br>
+            Nome: ${maiorSalario.nome}<br>
+            Idade: ${maiorSalario.idade}<br>
+            Profissão: ${maiorSalario.profissao}<br>
+            Salário: R$ ${parseFloat(maiorSalario.salario).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}<br>
+            <img src="${maiorSalario.foto}" alt="${maiorSalario.nome}" style="width: 75px; height: 80px; border-radius: 10%;">
+        `;
+    }
+
+    document.getElementById("mediaButton").addEventListener("click", calcularMediaIdades);
+    document.getElementById("homemButton").addEventListener("click", encontrarHomemMaisVelho);
+    document.getElementById("salarioButton").addEventListener("click", encontrarMaiorSalario);
+
+    listarPessoas(pessoas); 
+</script>
+
+</body>
+</html>
+
+
+
+
+
